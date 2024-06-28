@@ -1,0 +1,135 @@
+CODE TO READ DATA FROM THINGSPEAK AND DISPLAYON GOOGLE MAPS:-
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<title>VECHILE TRACKING USING IOT</title>
+
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+
+<meta charset="utf-8">
+
+<style>
+
+/* Always set the map height explicitly to define the size of the div
+* element that contains the map. */
+#map {
+
+height: 100%;
+ 
+}
+
+/* Optional: Makes the sample page fill the window. */
+html, body { height: 100%; margin: 25px; padding: 0;
+}
+
+</style>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBekTHC3mQ9Am0xgL_2k9PJJH7t 35_Z5cw&callback=initMap">
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+<script>
+
+/*TO READ DATA FROM THINGSPEAK*/
+var map; var x;
+function loadmaps(){
+
+$.getJSON("https://api.thingspeak.com/channels/THINGSPEAK CHANNEL ID/fields/1/last.json?api_key=THINGSPEAK READ API KEY&results=2", function(result){
+
+
+/*JSON DATA IS STORED IN “result”*/
+var m = result;
+ 
+x=Number(m.field1); /*EXTRACTING FIELD DATA*/ var xv=x;
+$(document).ready(function() {
+
+$('#Latitude').val(xv);
+
+});
+
+});
+
+$.getJSON("https://api.thingspeak.com/channels/THINGSPEAK CHANNEL ID/fields/2/last.json?api_key=THINGSPEAK READ API KEY&results=2", function(result1){
+/*JSON DATA IS STORED IN “result1”*/
+
+var m = result1;
+
+y=Number(m.field2); /*EXTRACTING FIELD DATA*/
+
+var yv=y;
+
+$(document).ready(function() {
+
+$('#Longitude').val(yv);
+
+});
+
+}).done(function() {
+
+initialize();
+
+});
+
+}
+
+/*TO RELOAD THE PAGE AFTER EVERY 9 SECONDS*/
+
+window.setInterval(function(){ loadmaps();
+ 
+}, 9000);
+
+function initialize() {
+
+//alert(y);
+
+/*TO LOCATE LATITUDE AND LONGITUDE ON GOOGLE MAPS*/
+
+var mapOptions = { zoom: 17,
+center: {lat: x, lng: y}
+
+};
+
+map = new google.maps.Map(document.getElementById('map'), mapOptions);
+/* TO SHOW MARKER ON GOOGLE MAPS*/
+
+var marker = new google.maps.Marker({ position: {lat: x, lng: y},
+map: map
+
+});
+
+var infowindow = new google.maps.InfoWindow({
+
+content: '<p>Marker Location:' + marker.getPosition() + '</p>'
+
+});
+
+google.maps.event.addListener(marker, 'click', function() { infowindow.open(map, marker);
+});
+
+}
+ 
+google.maps.event.addDomListener(window, 'load', initialize);
+
+</script>
+
+</head>
+
+<body >
+
+<p1>Latitude</p1>
+
+<input id="Latitude" type="text">
+
+<p1>Longitude</p1>
+
+<input id="Longitude" type="text">
+
+<div id="map"></div>
+
+</body>
+
+</html>
